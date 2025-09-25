@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="./output.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800&family=Noto+Serif+Devanagari:wght@100..900&display=swap"
+        rel="stylesheet">
+    <title>सदानीरा महोत्सव | निमंत्रण</title>
+
+    <style>
+        .noto-serif {
+            font-family: "Noto Serif Devanagari", serif;
+            font-optical-sizing: auto;
+            font-weight: 700;
+            font-style: normal;
+            font-variation-settings:
+                "wdth" 100;
+        }
+
+        .baloo-2-500 {
+            font-family: "Baloo 2", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 500;
+            font-style: normal;
+        }
+
+        /* Modal styling */
+        #authModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+        }
+
+        #authModalContent {
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            width: 300px;
+            text-align: center;
+        }
+
+        #authModal input {
+            width: 100%;
+            padding: 4px 10px;
+            margin: 5px 0;
+            border: 1px solid #131010;
+            border-radius: 5px;
+        }
+
+        #authError {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Authentication Modal -->
+    <div id="authModal" class="hidden">
+        <div id="authModalContent">
+            <h2 class="baloo-2-500 text text-2xl text-amber-600">Login Required</h2>
+            <input type="text" id="username" placeholder="Username" class="baloo-2-500">
+            <input type="password" id="password" placeholder="Password" class="baloo-2-500">
+            <button onclick="authenticate()" class="w-full py-1 bg-green-700 mt-3 text-white baloo-2-500 rounded-md text-xl">Login</button>
+            <p id="authError" class="font-semibold hidden  text-red-700">Invalid username or password!</p>
+        </div>
+    </div>
+    <div id="mainContent" class="min-h-screen pb-4 bg-pink-400">
+        <div class="py-3 bg-pink-500 w-full text-center">
+            <div class="text-xl font-bold my-2 relative text-white md:text-3xl uppercase noto-serif">सदानीरा महोत्सव - 2025<span id="logoutBtn" class="hidden h-5 w-5 absolute right-3 overflow-hidden" onclick="logout()" title="लॉगआउट करे"><img src="./images/logout-icon.png" alt="" class="h-full w-full"></span></div>
+            <hr>
+            <div class="text-md md:text-2xl noto-serif mt-2 text-white baloo-2-500">निमंत्रण पत्र वेब पोर्टल <a
+                    href="https://www.facebook.com/pandey2app" target="_blank"><span class="text-blue-950 me-1 ">&nbsp;&copy;&nbsp;आदित्य प्रकाश पाण्डेय </span></a></div>
+        </div>
+        <div class="w-full flex justify-center items-center">
+            <form action="" class="flex w-full flex-wrap md:px-72">
+                <select name="gender" id="gender" class="w-full py-1 px-2 m-2 rounded-xl capitalize baloo-2-500 border-2">
+                    <option value="" selected>लिंग चयनित करें</option>
+                    <option value="male">पुरुष</option>
+                    <option value="female">स्त्री</option>
+                    <option value="femaleUnmarried">स्त्री (अविवाहित)</option>
+                    <option value="other">अन्य</option>
+                </select>
+                <p class="text-zinc-900 capitalize px-2 font-semibold baloo-2-500">*कृपया हिंदी में लिखे...</p>
+                <input type="text" name="name" id="name" class="w-full py-1 px-2 m-2 rounded-xl capitalize baloo-2-500 border-2"
+                    placeholder="कृपया नाम लिखें ">
+                <input type="text" name="sirname" id="sirnameinput" class="w-full px-2 py-1 m-2 rounded-xl capitalize baloo-2-500 border-2"
+                    placeholder="कार्यक्षेत्र या उपाधि लिखें, जैसे - डॉक्टर, लेखक इत्यादि...">
+                <input type="file" name="image" id="image" class="w-full py-1 m-2 rounded-xl capitalize border-2">
+            </form>
+        </div>
+
+        <!-- Modal for Cropping -->
+        <div id="cropModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40">
+            <div class="bg-white p-4 rounded-lg flex justify-center flex-col flex-wrap md:w-5/12 w-5/6 mx-auto">
+                <div id="cropContainer" class="max-w-md mx-auto">
+                    <img id="imagePreview" src="" alt="Preview" class="w-full">
+                </div>
+                <div class="w-full flex justify-between mt-2">
+                    <button id="cropButton" class="bg-blue-500 text-white px-4 py-2 rounded">Crop</button>
+                    <button id="cancelButton" class="bg-red-500 text-white px-4 py-2 rounded">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="card" class="relative md:w-3/12 mx-auto my-3 ">
+            <div id="photoContainer" class="absolute bg-sky-500 w-[44%] h-[28%] top-[57.5%] left-[28%] overflow-hidden">
+                <img src="" id="photo" alt="guest photo" class="object-cover object-center w-full h-full">
+            </div>
+            <div id="nameplate"
+                class="absolute md:top-[86.5%] top-[83.8%] left-[25%] w-[50%] bg-sky-500 h-8 md:flex flex-wrap justify-center content-center">
+                <div id="nameContainer" class="w-full">
+                    <p style="text-shadow: 0px 0px 3px rgb(2, 2, 2);"
+                        class="font-semibold text-yellow-300 text-center md:text-sm text-xs capitalize noto-serif"><span
+                            id="prefix" class="me-1">श्री</span><span id="nameELM">आदित्य प्रकाश पाण्डेय</span></p>
+                </div>
+                <div id="sirnameContainer" class="hidden">
+                    <p id="sirname" class="font-semibold text-white bg-sky-500 text-center capitalize text-xs baloo-2-500">
+                        टीम सदानीरा</p>
+                </div>
+            </div>
+            <img src="./images/Sadanira 2025.jpg" alt="" class="w-full h-full z-88">
+        </div>
+
+        <!-- Download Button -->
+        <div class="w-full flex justify-center items-center mt-4">
+            <button id="downloadBtn" class="bg-blue-500 hidden text-white px-4 py-2 rounded baloo-2-500">निमंत्रण कार्ड सुरक्षित करें</button>
+        </div>
+    </div>
+
+    <script src="card.js"></script>
+</body>
+
+</html>
