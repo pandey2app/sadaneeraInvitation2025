@@ -143,7 +143,7 @@ document.getElementById('downloadBtn').addEventListener('click', function () {
 
     // Ensure the card is visible for capturing
     card.classList.remove('hidden');
-
+    
     html2canvas(card).then(function (canvas) {
         // Create an <a> element to download the canvas image
         const link = document.createElement('a');
