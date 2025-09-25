@@ -234,8 +234,8 @@ function authenticate() {
     const password = document.getElementById('password').value;
 
     // Sample credentials for demo purposes
-    const validUsername = '';
-    const validPassword = '';
+    const validUsername = 'admin@cards';
+    const validPassword = 'aditya@sadaneera';
 
     if (username === validUsername && password === validPassword) {
 
