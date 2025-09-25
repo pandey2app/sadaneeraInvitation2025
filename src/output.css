@@ -33,7 +33,6 @@
     --color-pink-500: #ec4899;
     --color-zinc-900: #111827;
 
-
     --color-black: #000;
     --color-white: #fff;
     --spacing: 0.25rem;
@@ -235,6 +234,9 @@
   }
   .top-\[84\%\] {
     top: 84%;
+  }
+  .top-\[84\.4\%\] {
+    top: 84.4%;
   }
   .right-3 {
     right: calc(var(--spacing) * 3);
