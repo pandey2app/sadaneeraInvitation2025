@@ -367,19 +367,102 @@ document
                 }
             });
 
-            // Download PNG
-            const link = document.createElement('a');
+            // ==========================================
+            // SAVE INVITATION + UPLOAD CARD + DOWNLOAD
+            // ==========================================
 
-            link.href = canvas.toDataURL('image/png');
+            const invitation = await saveInvitationRecord();
+
+            if (!invitation) {
+                throw new Error('Invitation record could not be created.');
+            }
+
+            console.log('Invitation record created:', invitation);
+
+            // Upload PNG to Supabase Storage
+            const storagePath = await uploadCardToSupabase(
+                canvas,
+                invitation.invitation_number
+            );
+
+            console.log('Card uploaded to storage:', storagePath);
+
+
+            // ==========================================
+            // GET PUBLIC URL
+            // ==========================================
+
+            const { data: publicUrlData } =
+                supabaseClient
+                    .storage
+                    .from('invitations')
+                    .getPublicUrl(storagePath);
+
+            const generatedCardUrl =
+                publicUrlData.publicUrl;
+
+            console.log(
+                'Generated card URL:',
+                generatedCardUrl
+            );
+
+
+            // ==========================================
+            // UPDATE DATABASE
+            // ==========================================
+
+            const { error: updateError } =
+                await supabaseClient
+                    .from('invitations')
+                    .update({
+                        generated_card_url: generatedCardUrl
+                    })
+                    .eq(
+                        'invitation_number',
+                        invitation.invitation_number
+                    );
+
+            if (updateError) {
+                console.error(
+                    'generated_card_url update error:',
+                    updateError
+                );
+
+                throw updateError;
+            }
+
+            console.log(
+                'Invitation database record updated successfully.'
+            );
+
+
+            // ==========================================
+            // DOWNLOAD LOCALLY
+            // ==========================================
+
+            const link =
+                document.createElement('a');
+
+            link.href =
+                canvas.toDataURL('image/png');
 
             link.download =
-                'sadaneera-2025-invitation.png';
+                `${invitation.invitation_number}.png`;
 
             document.body.appendChild(link);
 
             link.click();
 
             link.remove();
+
+
+            // ==========================================
+            // SUCCESS
+            // ==========================================
+
+            alert(
+                `निमंत्रण सफलतापूर्वक सुरक्षित हो गया।\n\nInvitation No: ${invitation.invitation_number}`
+            );
 
         } catch (error) {
 
