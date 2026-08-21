@@ -25,11 +25,11 @@ image.addEventListener('input', (event) => {
                 sirnameContainer.classList.add('hidden')
             }
             if (gender.value.toLowerCase() !== 'other') {
-                if(gender.value.toLowerCase() === 'femaleunmarried'){
+                if (gender.value.toLowerCase() === 'femaleunmarried') {
                     document.getElementById('prefix').innerHTML = 'सुश्री'
-                }else if(gender.value.toLowerCase() === 'male'){
+                } else if (gender.value.toLowerCase() === 'male') {
                     document.getElementById('prefix').innerHTML = 'श्री'
-                }else{
+                } else {
                     document.getElementById('prefix').innerHTML = 'श्रीमती'
                 }
             } else {
@@ -85,12 +85,12 @@ sirname.addEventListener('change', () => {
 })
 gender.addEventListener('change', () => {
     if (gender.value.toLowerCase() !== 'other') {
-        if(gender.value.toLowerCase() === 'femaleunmarried'){
-            
+        if (gender.value.toLowerCase() === 'femaleunmarried') {
+
             document.getElementById('prefix').innerHTML = 'सुश्री'
-        }else if(gender.value.toLowerCase() === 'male'){
+        } else if (gender.value.toLowerCase() === 'male') {
             document.getElementById('prefix').innerHTML = 'श्री'
-        }else{
+        } else {
             document.getElementById('prefix').innerHTML = 'श्रीमती'
         }
     } else {
@@ -208,73 +208,203 @@ async function uploadCardToSupabase(canvas, invitationNumber) {
 }
 
 // Function to download the card as an image
-document.getElementById('downloadBtn').addEventListener('click', async function () {
+// =====================================================
+// DOWNLOAD CARD - OKLCH SAFE VERSION
+// =====================================================
 
-    const downloadBtn = document.getElementById('downloadBtn');
-    const card = document.getElementById('card');
+document
+    .getElementById('downloadBtn')
+    .addEventListener('click', async function () {
 
-    try {
-
-        downloadBtn.disabled = true;
-        downloadBtn.textContent = 'कार्ड सुरक्षित किया जा रहा है...';
+        const card =
+            document.getElementById('card');
 
         card.classList.remove('hidden');
 
-        // Generate PNG
-        const canvas = await html2canvas(card);
 
-        // Save invitation information
-        const savedInvitation = await saveInvitationRecord();
+        try {
 
-        if (!savedInvitation) {
-            throw new Error('Invitation record could not be saved.');
+            const canvas = await html2canvas(card, {
+
+                useCORS: true,
+
+                allowTaint: true,
+
+                backgroundColor: null,
+
+                scale: 2,
+
+                logging: false,
+
+
+                // -----------------------------------------
+                // IMPORTANT:
+                // Convert Tailwind OKLCH colors to RGB
+                // before html2canvas parses the DOM.
+                // -----------------------------------------
+
+                onclone: function (clonedDocument) {
+
+                    const clonedCard =
+                        clonedDocument.getElementById('card');
+
+
+                    if (!clonedCard) {
+                        return;
+                    }
+
+
+                    const elements =
+                        clonedCard.querySelectorAll('*');
+
+
+                    elements.forEach(function (element) {
+
+                        const computed =
+                            clonedDocument.defaultView
+                                .getComputedStyle(element);
+
+
+                        // Text color
+                        if (computed.color) {
+
+                            element.style.color =
+                                computed.color;
+                        }
+
+
+                        // Background color
+                        if (
+                            computed.backgroundColor &&
+                            computed.backgroundColor !==
+                            'rgba(0, 0, 0, 0)'
+                        ) {
+
+                            element.style.backgroundColor =
+                                computed.backgroundColor;
+                        }
+
+
+                        // Border colors
+                        if (computed.borderTopColor) {
+
+                            element.style.borderTopColor =
+                                computed.borderTopColor;
+                        }
+
+                        if (computed.borderRightColor) {
+
+                            element.style.borderRightColor =
+                                computed.borderRightColor;
+                        }
+
+                        if (computed.borderBottomColor) {
+
+                            element.style.borderBottomColor =
+                                computed.borderBottomColor;
+                        }
+
+                        if (computed.borderLeftColor) {
+
+                            element.style.borderLeftColor =
+                                computed.borderLeftColor;
+                        }
+
+
+                        // Text shadow
+                        if (
+                            computed.textShadow &&
+                            computed.textShadow !== 'none'
+                        ) {
+
+                            element.style.textShadow =
+                                computed.textShadow;
+                        }
+
+
+                        // Box shadow
+                        if (
+                            computed.boxShadow &&
+                            computed.boxShadow !== 'none'
+                        ) {
+
+                            element.style.boxShadow =
+                                computed.boxShadow;
+                        }
+
+                    });
+
+
+                    // -----------------------------------------
+                    // Also normalize the main card itself
+                    // -----------------------------------------
+
+                    const cardStyle =
+                        clonedDocument.defaultView
+                            .getComputedStyle(clonedCard);
+
+
+                    if (cardStyle.color) {
+
+                        clonedCard.style.color =
+                            cardStyle.color;
+                    }
+
+
+                    if (
+                        cardStyle.backgroundColor &&
+                        cardStyle.backgroundColor !==
+                        'rgba(0, 0, 0, 0)'
+                    ) {
+
+                        clonedCard.style.backgroundColor =
+                            cardStyle.backgroundColor;
+                    }
+
+                }
+
+            });
+
+
+            // -----------------------------------------
+            // Create PNG
+            // -----------------------------------------
+
+            const link =
+                document.createElement('a');
+
+
+            link.href =
+                canvas.toDataURL(
+                    'image/png'
+                );
+
+
+            link.download =
+                'sadaneera-2025-invitation.png';
+
+
+            document.body.appendChild(link);
+
+            link.click();
+
+            link.remove();
+
+
+        } catch (error) {
+
+            console.error(
+                'Card generation/save error:',
+                error
+            );
+
+
+            alert(
+                'निमंत्रण कार्ड बनाने में समस्या हुई। कृपया दोबारा प्रयास करें।'
+            );
         }
 
-        // Upload generated card
-        const cardPath = await uploadCardToSupabase(
-            canvas,
-            savedInvitation.invitation_number
-        );
-
-        // Save card path in database
-        const { error: updateError } = await supabaseClient
-            .from('invitations')
-            .update({
-                generated_card_url: cardPath
-            })
-            .eq('id', savedInvitation.id);
-
-        if (updateError) {
-            throw updateError;
-        }
-
-        // Download locally
-        const link = document.createElement('a');
-
-        link.href = canvas.toDataURL('image/png');
-
-        link.download =
-            `${savedInvitation.invitation_number}.png`;
-
-        link.click();
-
-        downloadBtn.textContent = 'निमंत्रण कार्ड सुरक्षित करें';
-        downloadBtn.disabled = false;
-
-        alert('निमंत्रण कार्ड सफलतापूर्वक सुरक्षित हो गया।');
-
-    } catch (error) {
-
-        console.error('Card generation/save error:', error);
-
-        alert(
-            'कार्ड सुरक्षित करने में समस्या हुई। कृपया Console में error देखें।'
-        );
-
-        downloadBtn.textContent = 'निमंत्रण कार्ड सुरक्षित करें';
-        downloadBtn.disabled = false;
-    }
-});
+    });
 
 const photoDiv = document.getElementById("photoContainer");
 
