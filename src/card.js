@@ -207,189 +207,179 @@ async function uploadCardToSupabase(canvas, invitationNumber) {
     return data.path;
 }
 
-// Function to download the card as an image
-// =====================================================
-// DOWNLOAD CARD - OKLCH SAFE VERSION
-// =====================================================
+/// Function to download the card as an image
+// Simple html2canvas-safe version.
+// Tailwind styles are removed only from html2canvas's cloned document,
+// so the normal page design remains unchanged.
 
 document
     .getElementById('downloadBtn')
     .addEventListener('click', async function () {
 
-        const card =
-            document.getElementById('card');
+        const card = document.getElementById('card');
 
         card.classList.remove('hidden');
-
 
         try {
 
             const canvas = await html2canvas(card, {
 
                 useCORS: true,
-
                 allowTaint: true,
-
                 backgroundColor: null,
-
                 scale: 2,
-
                 logging: false,
-
-
-                // -----------------------------------------
-                // IMPORTANT:
-                // Convert Tailwind OKLCH colors to RGB
-                // before html2canvas parses the DOM.
-                // -----------------------------------------
 
                 onclone: function (clonedDocument) {
 
                     const clonedCard =
                         clonedDocument.getElementById('card');
 
+                    if (!clonedCard) return;
 
-                    if (!clonedCard) {
-                        return;
+                    // Remove external stylesheets from the clone.
+                    // This prevents Tailwind OKLCH values reaching html2canvas.
+                    clonedDocument
+                        .querySelectorAll('link[rel="stylesheet"]')
+                        .forEach(function (link) {
+                            link.remove();
+                        });
+
+                    // Remove inline stylesheets from the clone.
+                    clonedDocument
+                        .querySelectorAll('style')
+                        .forEach(function (style) {
+                            style.remove();
+                        });
+
+                    // Card itself
+                    clonedCard.style.position = 'relative';
+                    clonedCard.style.display = 'block';
+                    clonedCard.style.overflow = 'hidden';
+
+                    // Invitation background
+                    const backgroundImage =
+                        clonedCard.querySelector(':scope > img');
+
+                    if (backgroundImage) {
+                        backgroundImage.style.display = 'block';
+                        backgroundImage.style.width = '100%';
+                        backgroundImage.style.height = 'auto';
                     }
 
+                    // Guest photo container
+                    const photoContainer =
+                        clonedDocument.getElementById('photoContainer');
 
-                    const elements =
-                        clonedCard.querySelectorAll('*');
-
-
-                    elements.forEach(function (element) {
-
-                        const computed =
-                            clonedDocument.defaultView
-                                .getComputedStyle(element);
-
-
-                        // Text color
-                        if (computed.color) {
-
-                            element.style.color =
-                                computed.color;
-                        }
-
-
-                        // Background color
-                        if (
-                            computed.backgroundColor &&
-                            computed.backgroundColor !==
-                            'rgba(0, 0, 0, 0)'
-                        ) {
-
-                            element.style.backgroundColor =
-                                computed.backgroundColor;
-                        }
-
-
-                        // Border colors
-                        if (computed.borderTopColor) {
-
-                            element.style.borderTopColor =
-                                computed.borderTopColor;
-                        }
-
-                        if (computed.borderRightColor) {
-
-                            element.style.borderRightColor =
-                                computed.borderRightColor;
-                        }
-
-                        if (computed.borderBottomColor) {
-
-                            element.style.borderBottomColor =
-                                computed.borderBottomColor;
-                        }
-
-                        if (computed.borderLeftColor) {
-
-                            element.style.borderLeftColor =
-                                computed.borderLeftColor;
-                        }
-
-
-                        // Text shadow
-                        if (
-                            computed.textShadow &&
-                            computed.textShadow !== 'none'
-                        ) {
-
-                            element.style.textShadow =
-                                computed.textShadow;
-                        }
-
-
-                        // Box shadow
-                        if (
-                            computed.boxShadow &&
-                            computed.boxShadow !== 'none'
-                        ) {
-
-                            element.style.boxShadow =
-                                computed.boxShadow;
-                        }
-
-                    });
-
-
-                    // -----------------------------------------
-                    // Also normalize the main card itself
-                    // -----------------------------------------
-
-                    const cardStyle =
-                        clonedDocument.defaultView
-                            .getComputedStyle(clonedCard);
-
-
-                    if (cardStyle.color) {
-
-                        clonedCard.style.color =
-                            cardStyle.color;
+                    if (photoContainer) {
+                        photoContainer.style.position = 'absolute';
+                        photoContainer.style.left = '28%';
+                        photoContainer.style.top = '57.5%';
+                        photoContainer.style.width = '44%';
+                        photoContainer.style.height = '28%';
+                        photoContainer.style.overflow = 'hidden';
                     }
 
+                    const clonedPhoto =
+                        clonedDocument.getElementById('photo');
 
-                    if (
-                        cardStyle.backgroundColor &&
-                        cardStyle.backgroundColor !==
-                        'rgba(0, 0, 0, 0)'
-                    ) {
-
-                        clonedCard.style.backgroundColor =
-                            cardStyle.backgroundColor;
+                    if (clonedPhoto) {
+                        clonedPhoto.style.display = 'block';
+                        clonedPhoto.style.width = '100%';
+                        clonedPhoto.style.height = '100%';
+                        clonedPhoto.style.objectFit = 'cover';
+                        clonedPhoto.style.objectPosition = 'center';
                     }
 
+                    // Name plate
+                    const nameplate =
+                        clonedDocument.getElementById('nameplate');
+
+                    if (nameplate) {
+                        nameplate.style.position = 'absolute';
+                        nameplate.style.left = '25%';
+                        nameplate.style.top = '84.4%';
+                        nameplate.style.width = '50%';
+                        nameplate.style.height = '32px';
+                        nameplate.style.display = 'flex';
+                        nameplate.style.flexWrap = 'wrap';
+                        nameplate.style.justifyContent = 'center';
+                        nameplate.style.alignContent = 'center';
+                    }
+
+                    const nameContainer =
+                        clonedDocument.getElementById('nameContainer');
+
+                    if (nameContainer) {
+                        nameContainer.style.width = '100%';
+                    }
+
+                    // Guest name
+                    const clonedName =
+                        clonedDocument.getElementById('nameELM');
+
+                    if (clonedName) {
+                        clonedName.style.color = '#fde047';
+                        clonedName.style.fontFamily =
+                            '"Noto Serif Devanagari", serif';
+                        clonedName.style.fontWeight = '600';
+                        clonedName.style.fontSize = '12px';
+                        clonedName.style.textAlign = 'center';
+                    }
+
+                    const clonedPrefix =
+                        clonedDocument.getElementById('prefix');
+
+                    if (clonedPrefix) {
+                        clonedPrefix.style.color = '#fde047';
+                        clonedPrefix.style.fontWeight = '600';
+                        clonedPrefix.style.marginRight = '4px';
+                    }
+
+                    // Designation
+                    const sirnameContainer =
+                        clonedDocument.getElementById('sirnameContainer');
+
+                    if (sirnameContainer) {
+
+                        const hidden =
+                            sirnameContainer.classList.contains('hidden');
+
+                        sirnameContainer.style.display =
+                            hidden ? 'none' : 'block';
+
+                        if (!hidden) {
+                            sirnameContainer.style.width = '100%';
+                        }
+                    }
+
+                    const clonedSirname =
+                        clonedDocument.getElementById('sirname');
+
+                    if (clonedSirname) {
+                        clonedSirname.style.color = '#ffffff';
+                        clonedSirname.style.fontFamily =
+                            '"Baloo 2", sans-serif';
+                        clonedSirname.style.fontWeight = '600';
+                        clonedSirname.style.fontSize = '12px';
+                        clonedSirname.style.textAlign = 'center';
+                    }
                 }
-
             });
 
+            // Download PNG
+            const link = document.createElement('a');
 
-            // -----------------------------------------
-            // Create PNG
-            // -----------------------------------------
-
-            const link =
-                document.createElement('a');
-
-
-            link.href =
-                canvas.toDataURL(
-                    'image/png'
-                );
-
+            link.href = canvas.toDataURL('image/png');
 
             link.download =
                 'sadaneera-2025-invitation.png';
-
 
             document.body.appendChild(link);
 
             link.click();
 
             link.remove();
-
 
         } catch (error) {
 
@@ -398,12 +388,10 @@ document
                 error
             );
 
-
             alert(
                 'निमंत्रण कार्ड बनाने में समस्या हुई। कृपया दोबारा प्रयास करें।'
             );
         }
-
     });
 
 const photoDiv = document.getElementById("photoContainer");
