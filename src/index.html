@@ -77,20 +77,27 @@
             <h2 class="baloo-2-500 text text-2xl text-amber-600">Login Required</h2>
             <input type="text" id="username" placeholder="Username" class="baloo-2-500">
             <input type="password" id="password" placeholder="Password" class="baloo-2-500">
-            <button onclick="authenticate()" class="w-full py-1 bg-green-700 mt-3 text-white baloo-2-500 rounded-md text-xl">Login</button>
+            <button onclick="authenticate()"
+                class="w-full py-1 bg-green-700 mt-3 text-white baloo-2-500 rounded-md text-xl">Login</button>
             <p id="authError" class="font-semibold hidden  text-red-700">Invalid username or password!</p>
         </div>
     </div>
     <div id="mainContent" class="min-h-screen pb-4 bg-pink-400">
         <div class="py-3 bg-pink-500 w-full text-center">
-            <div class="text-xl font-bold my-2 relative text-white md:text-3xl uppercase noto-serif">सदानीरा महोत्सव - 2025<span id="logoutBtn" class="hidden h-5 w-5 absolute right-3 overflow-hidden" onclick="logout()" title="लॉगआउट करे"><img src="./images/logout-icon.png" alt="" class="h-full w-full"></span></div>
+            <div class="text-xl font-bold my-2 relative text-white md:text-3xl uppercase noto-serif">सदानीरा महोत्सव -
+                2025 <a href="admin.html" class="dashboard-btn">
+                    📊 Dashboard
+                </a><span id="logoutBtn" class="hidden h-5 w-5 absolute right-3 overflow-hidden" onclick="logout()"
+                    title="लॉगआउट करे"><img src="./images/logout-icon.png" alt="" class="h-full w-full"></span></div>
             <hr>
             <div class="text-md md:text-2xl noto-serif mt-2 text-white baloo-2-500">निमंत्रण पत्र वेब पोर्टल <a
-                    href="https://www.facebook.com/pandey2app" target="_blank"><span class="text-blue-950 me-1 ">&nbsp;&copy;&nbsp;आदित्य प्रकाश पाण्डेय </span></a></div>
+                    href="https://www.facebook.com/pandey2app" target="_blank"><span
+                        class="text-blue-950 me-1 ">&nbsp;&copy;&nbsp;आदित्य प्रकाश पाण्डेय </span></a></div>
         </div>
         <div class="w-full flex justify-center items-center">
             <form action="" class="flex w-full flex-wrap md:px-72">
-                <select name="gender" id="gender" class="w-full py-1 px-2 m-2 rounded-xl capitalize baloo-2-500 border-2">
+                <select name="gender" id="gender"
+                    class="w-full py-1 px-2 m-2 rounded-xl capitalize baloo-2-500 border-2">
                     <option value="" selected>लिंग चयनित करें</option>
                     <option value="male">पुरुष</option>
                     <option value="female">स्त्री</option>
@@ -98,9 +105,11 @@
                     <option value="other">अन्य</option>
                 </select>
                 <p class="text-zinc-900 capitalize px-2 font-semibold baloo-2-500">*कृपया हिंदी में लिखे...</p>
-                <input type="text" name="name" id="name" class="w-full py-1 px-2 m-2 rounded-xl capitalize baloo-2-500 border-2"
+                <input type="text" name="name" id="name"
+                    class="w-full py-1 px-2 m-2 rounded-xl capitalize baloo-2-500 border-2"
                     placeholder="कृपया नाम लिखें ">
-                <input type="text" name="sirname" id="sirnameinput" class="w-full px-2 py-1 m-2 rounded-xl capitalize baloo-2-500 border-2"
+                <input type="text" name="sirname" id="sirnameinput"
+                    class="w-full px-2 py-1 m-2 rounded-xl capitalize baloo-2-500 border-2"
                     placeholder="कार्यक्षेत्र या उपाधि लिखें, जैसे - डॉक्टर, लेखक इत्यादि...">
                 <input type="file" name="image" id="image" class="w-full py-1 m-2 rounded-xl capitalize border-2">
             </form>
@@ -140,7 +149,8 @@
 
         <!-- Download Button -->
         <div class="w-full flex justify-center items-center mt-4">
-            <button id="downloadBtn" class="bg-blue-500 hidden text-white px-4 py-2 rounded baloo-2-500">निमंत्रण कार्ड सुरक्षित करें</button>
+            <button id="downloadBtn" class="bg-blue-500 hidden text-white px-4 py-2 rounded baloo-2-500">निमंत्रण कार्ड
+                सुरक्षित करें</button>
         </div>
     </div>
 
@@ -156,7 +166,7 @@
         );
     </script>
 
-<script src="card.js"></script>
+    <script src="card.js"></script>
 </body>
 
 </html>
