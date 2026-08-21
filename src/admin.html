@@ -1,0 +1,1980 @@
+<!DOCTYPE html>
+<html lang="hi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>सदानीरा महोत्सव | निमंत्रण प्रबंधन</title>
+
+    <link href="./output.css" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700&family=Noto+Serif+Devanagari:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --pink: #d81b60;
+            --pink-dark: #b91450;
+            --pink-soft: #fff1f6;
+            --pink-line: #f5c5d6;
+            --text: #252525;
+            --muted: #777;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #fff;
+            color: var(--text);
+            font-family: "Baloo 2", sans-serif;
+        }
+
+        .devanagari {
+            font-family: "Noto Serif Devanagari", serif;
+        }
+
+        .page-shell {
+            min-height: 100vh;
+            border-left: 5px solid var(--pink);
+        }
+
+        .topbar {
+            border-bottom: 1px solid var(--pink-line);
+            background: #fff;
+        }
+
+        .brand-mark {
+            width: 58px;
+            height: 58px;
+            border: 2px solid var(--pink);
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            color: var(--pink);
+            font-size: 28px;
+            flex: 0 0 auto;
+        }
+
+        .brand-title {
+            color: var(--pink);
+            line-height: 1.05;
+            letter-spacing: -0.02em;
+        }
+
+        .profile-box {
+            border: 1px solid var(--pink-line);
+            border-radius: 12px;
+            background: #fff;
+        }
+
+        .profile-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--pink);
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-weight: 700;
+        }
+
+        .logout {
+            border: 1px solid var(--pink);
+            background: var(--pink);
+            color: white;
+            border-radius: 8px;
+            transition: .18s ease;
+        }
+
+        .logout:hover {
+            background: var(--pink-dark);
+        }
+
+        .section-title {
+            color: var(--pink);
+            font-weight: 800;
+        }
+
+        .subtle-line {
+            height: 1px;
+            background: var(--pink-line);
+        }
+
+        .date-box {
+            border: 1px solid var(--pink-line);
+            background: var(--pink-soft);
+            border-radius: 10px;
+        }
+
+        .stat {
+            border: 1px solid var(--pink-line);
+            border-left: 4px solid var(--pink);
+            border-radius: 10px;
+            background: #fff;
+            transition: .18s ease;
+        }
+
+        .stat:hover {
+            box-shadow: 0 8px 24px rgba(216, 27, 96, .08);
+            transform: translateY(-1px);
+        }
+
+        .stat-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: 20px;
+        }
+
+        .search-input,
+        .filter-select {
+            width: 100%;
+            height: 44px;
+            border: 1px solid var(--pink-line);
+            border-radius: 8px;
+            background: #fff;
+            outline: none;
+            padding: 0 14px;
+            font-family: inherit;
+            transition: .15s ease;
+        }
+
+        .search-input:focus,
+        .filter-select:focus {
+            border-color: var(--pink);
+            box-shadow: 0 0 0 3px rgba(216, 27, 96, .08);
+        }
+
+        .table-wrap {
+            border: 1px solid var(--pink-line);
+            border-radius: 10px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+        thead th {
+            background: var(--pink-soft);
+            color: var(--pink);
+            font-weight: 700;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            border-top: 1px solid #f3f3f3;
+            transition: .12s ease;
+        }
+
+        tbody tr:hover {
+            background: #fff9fb;
+        }
+
+        .view-btn {
+            border: 1px solid var(--pink);
+            color: var(--pink);
+            background: white;
+            border-radius: 7px;
+            padding: 5px 12px;
+            font-weight: 600;
+            transition: .15s ease;
+        }
+
+        .view-btn:hover {
+            background: var(--pink);
+            color: white;
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(20, 20, 20, .62);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 100;
+        }
+
+        .modal-backdrop.show {
+            display: flex;
+        }
+
+        .modal {
+            width: min(900px, 100%);
+            max-height: 92vh;
+            overflow: auto;
+            background: white;
+            border-radius: 14px;
+            border: 1px solid var(--pink-line);
+        }
+
+        .modal-image-wrap {
+            background: #f8f8f8;
+            min-height: 250px;
+            display: grid;
+            place-items: center;
+        }
+
+        .modal-image {
+            max-width: 100%;
+            max-height: 65vh;
+            object-fit: contain;
+        }
+
+        .download-card-btn {
+            display: none;
+            align-items: center;
+            justify-content: center;
+
+            background: #d81b60 !important;
+            color: #ffffff !important;
+
+            border: 1px solid #d81b60;
+            border-radius: 8px;
+
+            padding: 9px 18px;
+
+            font-family: "Baloo 2", sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+
+            text-decoration: none !important;
+
+            cursor: pointer;
+
+            transition: all 0.18s ease;
+        }
+
+        .download-card-btn:hover {
+            background: #b91450 !important;
+            border-color: #b91450;
+            color: #ffffff !important;
+        }
+
+        .empty {
+            padding: 48px 20px;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        @media (max-width: 768px) {
+            .page-shell {
+                border-left-width: 3px;
+            }
+
+            .brand-mark {
+                width: 48px;
+                height: 48px;
+                font-size: 22px;
+            }
+
+            .brand-title {
+                font-size: 25px;
+            }
+
+            .profile-box {
+                width: 100%;
+            }
+
+            .mobile-scroll {
+                overflow-x: auto;
+            }
+
+            .table-wrap table {
+                min-width: 900px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-shell">
+
+        <!-- HEADER -->
+        <header class="topbar">
+            <div class="max-w-7xl mx-auto px-4 md:px-6 py-5">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+
+                    <div class="flex items-center gap-4">
+                        <div class="brand-mark" aria-hidden="true">❖</div>
+
+                        <div>
+                            <div class="devanagari brand-title text-3xl md:text-4xl font-extrabold">
+                                सदानीरा महोत्सव
+                            </div>
+
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-pink-600">✦</span>
+                                <span class="devanagari text-lg md:text-xl font-semibold">
+                                    निमंत्रण प्रबंधन पैनल
+                                </span>
+                                <span class="text-pink-600">✦</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-box p-2.5 md:p-3 flex items-center gap-3">
+                        <div class="profile-avatar">A</div>
+
+                        <div class="min-w-0 flex-1">
+                            <div id="adminName" class="font-bold text-gray-900 truncate">
+                                Admin
+                            </div>
+                            <div id="adminEmail" class="text-sm text-gray-500 truncate">
+                                Loading...
+                            </div>
+                        </div>
+
+                        <button id="logoutBtn" class="logout px-4 py-2 text-sm font-semibold">
+                            ↪ लॉगआउट
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </header>
+
+
+        <!-- MAIN -->
+        <main class="max-w-7xl mx-auto px-4 md:px-6 py-7">
+
+            <!-- DASHBOARD TITLE + DATE -->
+            <section class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5 mb-6">
+
+                <div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl text-pink-600">▣</span>
+                        <h1 class="devanagari text-3xl font-bold section-title">
+                            डैशबोर्ड
+                        </h1>
+                    </div>
+
+                    <p class="devanagari text-gray-500 mt-1 ml-9">
+                        निमंत्रणों का सारांश और विवरण
+                    </p>
+                </div>
+
+                <div class="date-box px-5 py-3 flex items-center gap-5">
+                    <div>
+                        <div class="text-xs text-pink-600 font-semibold">आज की तारीख</div>
+                        <div id="todayDate" class="font-semibold"></div>
+                    </div>
+
+                    <div class="w-px h-9 bg-pink-200"></div>
+
+                    <div>
+                        <div class="text-xs text-pink-600 font-semibold">समय</div>
+                        <div id="currentTime" class="font-semibold"></div>
+                    </div>
+                </div>
+
+            </section>
+
+
+            <!-- STATS -->
+            <section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-7">
+
+                <div class="stat p-5">
+                    <div class="flex items-center justify-between gap-4">
+                        <div>
+                            <div class="text-gray-500 text-sm">कुल निमंत्रण</div>
+                            <div id="totalInvitations" class="text-3xl font-bold text-pink-600 mt-1">0</div>
+                            <div class="text-xs text-gray-400 mt-1">अब तक बनाए गए कुल निमंत्रण</div>
+                        </div>
+                        <div class="stat-icon bg-pink-100 text-pink-600">✉</div>
+                    </div>
+                </div>
+
+                <div class="stat p-5">
+                    <div class="flex items-center justify-between gap-4">
+                        <div>
+                            <div class="text-gray-500 text-sm">आज के निमंत्रण</div>
+                            <div id="todayInvitations" class="text-3xl font-bold text-green-600 mt-1">0</div>
+                            <div class="text-xs text-gray-400 mt-1">आज बनाए गए निमंत्रण</div>
+                        </div>
+                        <div class="stat-icon bg-green-100 text-green-600">▣</div>
+                    </div>
+                </div>
+
+                <div class="stat p-5">
+                    <div class="flex items-center justify-between gap-4">
+                        <div>
+                            <div class="text-gray-500 text-sm">मेरे निमंत्रण</div>
+                            <div id="myInvitations" class="text-3xl font-bold text-blue-600 mt-1">0</div>
+                            <div class="text-xs text-gray-400 mt-1">आपके द्वारा बनाए गए निमंत्रण</div>
+                        </div>
+                        <div class="stat-icon bg-blue-100 text-blue-600">●</div>
+                    </div>
+                </div>
+
+            </section>
+
+            <section class="mb-7">
+
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="text-pink-600 text-xl">▥</span>
+
+                    <h2 class="devanagari text-2xl font-bold section-title">
+                        प्रबंधक प्रदर्शन
+                    </h2>
+                </div>
+
+                <div class="subtle-line mb-4"></div>
+
+                <div id="adminPerformance" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                </div>
+
+            </section>
+
+            <section class="mb-5">
+
+                <div class="flex flex-col md:flex-row md:items-end gap-3">
+
+                    <div class="flex-1">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">
+                            समय अवधि
+                        </label>
+
+                        <select id="dateFilter" class="filter-select">
+                            <option value="all">सभी निमंत्रण</option>
+                            <option value="today">आज</option>
+                            <option value="yesterday">कल</option>
+                            <option value="week">इस सप्ताह</option>
+                            <option value="month">इस महीने</option>
+                        </select>
+                    </div>
+
+                    <div class="flex-1">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">
+                            कस्टम तारीख
+                        </label>
+
+                        <input id="customDate" type="date" class="search-input">
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- SEARCH / FILTER -->
+            <section class="mb-5">
+
+                <div class="flex flex-col md:flex-row gap-3 md:items-end">
+
+                    <div class="flex-1">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">
+                            निमंत्रण खोजें
+                        </label>
+                        <input id="searchInput" class="search-input" type="search"
+                            placeholder="नाम, पद या Invitation ID खोजें...">
+                    </div>
+
+                    <div class="w-full md:w-72">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">
+                            प्रबंधक के अनुसार फ़िल्टर
+                        </label>
+                        <select id="adminFilter" class="filter-select">
+                            <option value="">सभी प्रबंधक</option>
+                        </select>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- ADMIN MANAGEMENT -->
+            <section id="adminManagement" class="mb-7 hidden">
+
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="text-pink-600 text-xl">♙</span>
+
+                    <h2 class="devanagari text-2xl font-bold section-title">
+                        Admin प्रबंधन
+                    </h2>
+                </div>
+
+                <div class="subtle-line mb-4"></div>
+
+                <div class="border border-pink-100 rounded-xl bg-white p-5">
+
+                    <h3 class="devanagari text-lg font-bold text-gray-800 mb-4">
+                        नया Admin बनाएँ
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">
+                                Admin का नाम
+                            </label>
+
+                            <input id="newAdminName" type="text" class="search-input" placeholder="जैसे Rahul Kumar">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">
+                                Login Email
+                            </label>
+
+                            <input id="newAdminEmail" type="email" class="search-input" placeholder="rahul@example.com">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">
+                                Password
+                            </label>
+
+                            <input id="newAdminPassword" type="password" class="search-input"
+                                placeholder="कम से कम 6 characters">
+                        </div>
+
+                    </div>
+
+
+                    <div class="mt-4 flex flex-col sm:flex-row sm:items-center gap-3">
+
+                        <button id="createAdminBtn" type="button" class="logout px-5 py-2.5 font-semibold">
+                            + नया Admin बनाएँ
+                        </button>
+
+                        <span id="adminMessage" class="text-sm">
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div class="mt-6">
+
+                    <h3 class="devanagari text-lg font-bold text-gray-800 mb-3">
+                        मौजूदा Admin
+                    </h3>
+
+                    <div class="border border-pink-100 rounded-xl overflow-hidden">
+
+                        <div id="adminListLoading" class="p-5 text-center text-gray-500">
+                            Admin list लोड हो रही है...
+                        </div>
+
+                        <div class="overflow-x-auto">
+
+                            <table class="w-full min-w-[650px]">
+
+                                <thead>
+                                    <tr class="bg-pink-50">
+
+                                        <th class="px-5 py-3 text-left text-pink-700">
+                                            नाम
+                                        </th>
+
+                                        <th class="px-5 py-3 text-left text-pink-700">
+                                            Login
+                                        </th>
+
+                                        <th class="px-5 py-3 text-left text-pink-700">
+                                            Role
+                                        </th>
+
+                                        <th class="px-5 py-3 text-center text-pink-700">
+                                            Action
+                                        </th>
+
+                                    </tr>
+                                </thead>
+
+                                <tbody id="adminList">
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- HISTORY -->
+            <section>
+
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="text-pink-600 text-xl">☷</span>
+                    <h2 class="devanagari text-2xl font-bold section-title">
+                        निमंत्रण इतिहास
+                    </h2>
+                </div>
+
+                <div class="subtle-line mb-4"></div>
+
+                <div class="table-wrap mobile-scroll">
+
+                    <table class="w-full">
+                        <thead>
+                            <tr>
+                                <th class="px-5 py-4 text-left">क्रमांक (ID)</th>
+                                <th class="px-5 py-4 text-left">आमंत्रित व्यक्ति</th>
+                                <th class="px-5 py-4 text-left">पद / प्रतिष्ठा</th>
+                                <th class="px-5 py-4 text-left">बनाया गया द्वारा</th>
+                                <th class="px-5 py-4 text-left">लॉगिन (ईमेल)</th>
+                                <th class="px-5 py-4 text-left">दिनांक एवं समय</th>
+                                <th class="px-5 py-4 text-center">कार्रवाई</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="invitationTable"></tbody>
+                    </table>
+
+                    <div id="loading" class="empty">
+                        निमंत्रण लोड हो रहे हैं...
+                    </div>
+
+                    <div id="emptyState" class="empty hidden">
+                        <div class="text-3xl mb-2">—</div>
+                        <div class="devanagari font-semibold text-gray-700">
+                            कोई निमंत्रण नहीं मिला
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+
+            <footer class="text-center py-8">
+                <div class="subtle-line mb-5"></div>
+                <div class="devanagari text-pink-600 font-semibold">
+                    ✦ सदानीरा महोत्सव समिति ✦
+                </div>
+                <div class="text-xs text-gray-400 mt-1">
+                    Invitation Management System
+                </div>
+            </footer>
+
+        </main>
+    </div>
+
+
+    <!-- CARD PREVIEW MODAL -->
+    <div id="cardModal" class="modal-backdrop">
+
+        <div class="modal">
+
+            <div class="p-4 border-b border-pink-100 flex items-center justify-between gap-4">
+                <div>
+                    <div class="devanagari text-xl font-bold text-gray-800">
+                        निमंत्रण कार्ड
+                    </div>
+                    <div id="modalInvitationId" class="text-sm text-gray-500"></div>
+                </div>
+
+                <button id="closeModal" class="text-gray-500 hover:text-pink-600 text-2xl leading-none"
+                    aria-label="Close">
+                    ×
+                </button>
+            </div>
+
+            <div class="modal-image-wrap">
+                <div id="modalLoading" class="text-gray-500">
+                    कार्ड लोड हो रहा है...
+                </div>
+
+                <img id="modalImage" class="modal-image hidden" alt="Generated invitation card">
+            </div>
+
+            <div class="p-4 border-t border-pink-100 flex justify-end gap-2">
+                <a id="downloadCardBtn" href="#" target="_blank" rel="noopener" class="download-card-btn">
+                    ↓ डाउनलोड कार्ड
+                </a>
+
+                <button id="closeModalBottom"
+                    class="border border-gray-300 text-gray-700 rounded-lg px-4 py-2 font-semibold">
+                    बंद करें
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+
+    <script>
+        // ==========================================
+        // SUPABASE
+        // ==========================================
+
+        const SUPABASE_URL =
+            'https://luxzqnmpxsoqrsxfpreg.supabase.co';
+
+        const SUPABASE_PUBLISHABLE_KEY =
+            'sb_publishable_xyauuD5OKpmNXxywzlZ5jQ_ct0OqaJi';
+
+        const supabaseClient =
+            supabase.createClient(
+                SUPABASE_URL,
+                SUPABASE_PUBLISHABLE_KEY
+            );
+
+
+        let currentUser = null;
+        let allInvitations = [];
+
+
+        // ==========================================
+        // DATE / TIME
+        // ==========================================
+
+        function updateClock() {
+            const now = new Date();
+
+            document.getElementById('todayDate').textContent =
+                now.toLocaleDateString('hi-IN', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric',
+                    weekday: 'long'
+                });
+
+            document.getElementById('currentTime').textContent =
+                now.toLocaleTimeString('en-IN', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+        }
+
+        updateClock();
+        setInterval(updateClock, 1000);
+
+
+        // ==========================================
+        // AUTH
+        // ==========================================
+
+        async function checkAdminLogin() {
+            const { data, error } =
+                await supabaseClient.auth.getUser();
+
+            if (error || !data.user) {
+                window.location.href = 'index.html';
+                return null;
+            }
+
+            currentUser = data.user;
+
+            const email = currentUser.email || 'Admin';
+            document.getElementById('adminEmail').textContent = email;
+
+            const initial = email.charAt(0).toUpperCase();
+            document.querySelector('.profile-avatar').textContent = initial;
+
+            document.getElementById('adminName').textContent =
+                email.split('@')[0];
+
+            return currentUser;
+        }
+
+
+        // ==========================================
+        // LOAD DATA
+        // ==========================================
+
+        async function loadInvitations() {
+
+            const { data: invitations, error: invitationError } =
+                await supabaseClient
+                    .from('invitations')
+                    .select('*')
+                    .order('created_at', {
+                        ascending: false
+                    });
+
+            if (invitationError) {
+                console.error(
+                    'Invitation loading error:',
+                    invitationError
+                );
+
+                document.getElementById('loading').textContent =
+                    'निमंत्रण लोड नहीं हो सके।';
+
+                return;
+            }
+
+
+            const { data: profiles, error: profileError } =
+                await supabaseClient
+                    .from('admin_profiles')
+                    .select('id, name, role');
+
+
+            if (profileError) {
+                console.error(
+                    'Admin profile loading error:',
+                    profileError
+                );
+
+                document.getElementById('loading').textContent =
+                    'Admin information लोड नहीं हो सकी।';
+
+                return;
+            }
+
+
+            const profileMap = {};
+
+            profiles.forEach(profile => {
+                profileMap[profile.id] = profile;
+            });
+
+
+            allInvitations = invitations.map(invitation => {
+
+                const profile =
+                    profileMap[invitation.generated_by];
+
+                return {
+                    ...invitation,
+
+                    generated_by_name:
+                        profile?.name ||
+                        invitation.generated_by_login ||
+                        'Unknown Admin'
+                };
+
+            });
+
+
+            populateAdminFilter();
+
+            updateStats();
+
+            updateAdminPerformance();
+
+            renderTable(allInvitations);
+
+            document.getElementById('loading')
+                .classList.add('hidden');
+        }
+
+
+        // ==========================================
+        // STATS
+        // ==========================================
+
+        function updateStats() {
+            document.getElementById('totalInvitations').textContent =
+                allInvitations.length;
+
+            const myCount = allInvitations.filter(item =>
+                item.generated_by === currentUser.id
+            ).length;
+
+            document.getElementById('myInvitations').textContent =
+                myCount;
+
+            const today = new Date().toLocaleDateString('en-CA');
+
+            const todayCount = allInvitations.filter(item => {
+                if (!item.created_at) return false;
+
+                return new Date(item.created_at)
+                    .toLocaleDateString('en-CA') === today;
+            }).length;
+
+            document.getElementById('todayInvitations').textContent =
+                todayCount;
+        }
+
+        function updateAdminPerformance() {
+
+            const container =
+                document.getElementById('adminPerformance');
+
+            container.innerHTML = '';
+
+            if (!allInvitations.length) {
+                container.innerHTML = `
+            <div class="text-gray-500 text-sm">
+                अभी कोई invitation उपलब्ध नहीं है।
+            </div>
+        `;
+                return;
+            }
+
+            const adminCounts = {};
+
+            allInvitations.forEach(invitation => {
+
+                const adminId =
+                    invitation.generated_by || 'unknown';
+
+                const adminName =
+                    invitation.generated_by_name ||
+                    invitation.generated_by_login ||
+                    'Unknown Admin';
+
+                if (!adminCounts[adminId]) {
+
+                    adminCounts[adminId] = {
+                        name: adminName,
+                        count: 0
+                    };
+
+                }
+
+                adminCounts[adminId].count++;
+
+            });
+
+
+            const admins =
+                Object.values(adminCounts)
+                    .sort((a, b) => b.count - a.count);
+
+
+            const total =
+                allInvitations.length;
+
+
+            admins.forEach(admin => {
+
+                const percentage =
+                    total > 0
+                        ? Math.round(
+                            (admin.count / total) * 100
+                        )
+                        : 0;
+
+
+                const wrapper =
+                    document.createElement('div');
+
+                wrapper.className =
+                    'border border-pink-100 rounded-xl p-4 bg-white';
+
+
+                wrapper.innerHTML = `
+
+            <div class="flex items-center justify-between gap-4 mb-2">
+
+                <div class="font-semibold text-gray-800">
+                    ${escapeHTML(admin.name)}
+                </div>
+
+                <div class="font-bold text-pink-600">
+                    ${admin.count}
+                </div>
+
+            </div>
+
+            <div class="h-2 bg-pink-50 rounded-full overflow-hidden">
+
+                <div
+                    class="h-full bg-pink-600 rounded-full"
+                    style="width: ${percentage}%">
+                </div>
+
+            </div>
+
+            <div class="text-xs text-gray-400 mt-2">
+                ${percentage}% of total invitations
+            </div>
+
+        `;
+
+                container.appendChild(wrapper);
+
+            });
+
+        }
+
+        // ==========================================
+        // ADMIN FILTER
+        // ==========================================
+
+        function populateAdminFilter() {
+
+            const select =
+                document.getElementById('adminFilter');
+
+            const admins = [];
+
+            allInvitations.forEach(item => {
+
+                if (!item.generated_by) {
+                    return;
+                }
+
+                const exists =
+                    admins.find(
+                        admin =>
+                            admin.id === item.generated_by
+                    );
+
+                if (!exists) {
+
+                    admins.push({
+                        id: item.generated_by,
+                        name: item.generated_by_name
+                    });
+
+                }
+
+            });
+
+
+            select.innerHTML =
+                '<option value="">सभी प्रबंधक</option>';
+
+
+            admins.forEach(admin => {
+
+                const option =
+                    document.createElement('option');
+
+                option.value = admin.id;
+
+                option.textContent =
+                    admin.name;
+
+                select.appendChild(option);
+
+            });
+        }
+
+
+        // ==========================================
+        // SEARCH / FILTER
+        // ==========================================
+
+        function applyFilters() {
+
+            const search =
+                document.getElementById('searchInput')
+                    .value
+                    .trim()
+                    .toLowerCase();
+
+            const selectedAdmin =
+                document.getElementById('adminFilter').value;
+
+
+            // First apply date filter
+            let filtered =
+                filterByDate(allInvitations);
+
+
+            // Then search + admin filter
+            filtered =
+                filtered.filter(item => {
+
+                    const searchable = [
+
+                        item.invitation_number,
+
+                        item.guest_name,
+
+                        item.designation,
+
+                        item.generated_by_name,
+
+                        item.generated_by_login
+
+                    ]
+                        .filter(Boolean)
+                        .join(' ')
+                        .toLowerCase();
+
+
+                    const matchesSearch =
+                        !search ||
+                        searchable.includes(search);
+
+
+                    const matchesAdmin =
+                        !selectedAdmin ||
+                        item.generated_by ===
+                        selectedAdmin;
+
+
+                    return (
+                        matchesSearch &&
+                        matchesAdmin
+                    );
+
+                });
+
+
+            renderTable(filtered);
+        }
+
+        document
+            .getElementById('dateFilter')
+            .addEventListener(
+                'change',
+                () => {
+
+                    document.getElementById(
+                        'customDate'
+                    ).value = '';
+
+                    applyFilters();
+
+                }
+            );
+
+
+        document
+            .getElementById('customDate')
+            .addEventListener(
+                'change',
+                () => {
+
+                    document.getElementById(
+                        'dateFilter'
+                    ).value = 'all';
+
+                    applyFilters();
+
+                }
+            );
+
+        document.getElementById('searchInput')
+            .addEventListener('input', applyFilters);
+
+        document.getElementById('adminFilter')
+            .addEventListener('change', applyFilters);
+
+
+        // ==========================================
+        // TABLE
+        // ==========================================
+
+        function renderTable(data) {
+            const table =
+                document.getElementById('invitationTable');
+
+            const emptyState =
+                document.getElementById('emptyState');
+
+            table.innerHTML = '';
+
+            if (!data.length) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            data.forEach(item => {
+                const row = document.createElement('tr');
+
+                const date = item.created_at
+                    ? new Date(item.created_at).toLocaleString('hi-IN', {
+                        dateStyle: 'medium',
+                        timeStyle: 'short'
+                    })
+                    : '-';
+
+                row.innerHTML = `
+                <td class="px-5 py-4 font-semibold text-gray-800 whitespace-nowrap">
+                    ${escapeHTML(item.invitation_number)}
+                </td>
+
+                <td class="px-5 py-4">
+                    <div class="font-bold text-gray-900">
+                        ${escapeHTML(item.guest_name || '-')}
+                    </div>
+                    <div class="text-xs text-gray-400 mt-0.5">
+                        ${escapeHTML(item.gender || '')}
+                    </div>
+                </td>
+
+                <td class="px-5 py-4 text-gray-600">
+                    ${escapeHTML(item.designation || '-')}
+                </td>
+
+                <td class="px-5 py-4">
+                    <span class="text-pink-600 font-semibold">
+                        ${escapeHTML(item.generated_by_name || '-')}
+                    </span>
+                </td>
+
+                <td class="px-5 py-4 text-gray-600">
+                    ${escapeHTML(item.generated_by_login || '-')}
+                </td>
+
+                <td class="px-5 py-4 text-gray-600 whitespace-nowrap">
+                    ${date}
+                </td>
+
+                <td class="px-5 py-4 text-center">
+                    ${item.generated_card_url
+                        ? `<button class="view-btn" onclick="viewCard('${escapeHTML(item.id)}')">
+                                देखें
+                           </button>`
+                        : `<span class="text-xs text-gray-400">उपलब्ध नहीं</span>`
+                    }
+                </td>
+            `;
+
+                table.appendChild(row);
+            });
+        }
+
+        function filterByDate(data) {
+
+            const filter =
+                document.getElementById('dateFilter').value;
+
+            const customDate =
+                document.getElementById('customDate').value;
+
+            const now = new Date();
+
+            // Custom date
+            if (customDate) {
+
+                return data.filter(item => {
+
+                    if (!item.created_at) return false;
+
+                    const itemDate =
+                        new Date(item.created_at)
+                            .toLocaleDateString('en-CA');
+
+                    return itemDate === customDate;
+
+                });
+
+            }
+
+
+            if (filter === 'all') {
+                return data;
+            }
+
+
+            return data.filter(item => {
+
+                if (!item.created_at) {
+                    return false;
+                }
+
+                const date =
+                    new Date(item.created_at);
+
+
+                // TODAY
+                if (filter === 'today') {
+
+                    return date.toDateString() ===
+                        now.toDateString();
+
+                }
+
+
+                // YESTERDAY
+                if (filter === 'yesterday') {
+
+                    const yesterday =
+                        new Date(now);
+
+                    yesterday.setDate(
+                        now.getDate() - 1
+                    );
+
+                    return date.toDateString() ===
+                        yesterday.toDateString();
+
+                }
+
+
+                // THIS WEEK
+                if (filter === 'week') {
+
+                    const startOfWeek =
+                        new Date(now);
+
+                    const day =
+                        startOfWeek.getDay();
+
+                    startOfWeek.setDate(
+                        now.getDate() - day
+                    );
+
+                    startOfWeek.setHours(
+                        0, 0, 0, 0
+                    );
+
+                    return date >= startOfWeek;
+
+                }
+
+
+                // THIS MONTH
+                if (filter === 'month') {
+
+                    return (
+                        date.getMonth() ===
+                        now.getMonth()
+                        &&
+                        date.getFullYear() ===
+                        now.getFullYear()
+                    );
+
+                }
+
+
+                return true;
+
+            });
+        }
+
+
+        // ==========================================
+        // VIEW CARD
+        // ==========================================
+
+        async function viewCard(id) {
+
+            const item = allInvitations.find(
+                invitation => invitation.id === id
+            );
+
+            console.log("Selected invitation:", item);
+
+            if (!item) {
+                alert("Invitation record not found.");
+                return;
+            }
+
+            if (!item.generated_card_url) {
+                alert("इस invitation का generated card उपलब्ध नहीं है।");
+                return;
+            }
+
+            const modal = document.getElementById('cardModal');
+            const image = document.getElementById('modalImage');
+            const loading = document.getElementById('modalLoading');
+            const download = document.getElementById('downloadCardBtn');
+
+            modal.classList.add('show');
+
+            image.style.display = 'none';
+            loading.style.display = 'block';
+
+            // IMPORTANT: explicitly hide download initially
+            download.style.display = 'none';
+
+            document.getElementById('modalInvitationId').textContent =
+                item.invitation_number;
+
+            console.log(
+                "Storage path:",
+                item.generated_card_url
+            );
+
+            const { data, error } =
+                await supabaseClient.storage
+                    .from('invitations')
+                    .createSignedUrl(
+                        item.generated_card_url,
+                        600
+                    );
+
+            console.log("Signed URL response:", data);
+            console.log("Signed URL error:", error);
+
+            if (error || !data || !data.signedUrl) {
+
+                loading.textContent =
+                    "कार्ड लोड नहीं हो सका।";
+
+                console.error(
+                    "Could not create signed URL:",
+                    error
+                );
+
+                return;
+            }
+
+            const signedUrl = data.signedUrl;
+
+            // Set preview
+            image.src = signedUrl;
+
+            // Set download
+            download.href = signedUrl;
+            download.download =
+                `${item.invitation_number}.png`;
+
+            // VERY IMPORTANT
+            // Do not rely on Tailwind's hidden class.
+            download.classList.add('download-card-btn');
+            download.style.display = 'inline-flex';
+            download.style.alignItems = 'center';
+            download.style.justifyContent = 'center';
+
+            console.log(
+                "DOWNLOAD BUTTON SHOULD NOW BE VISIBLE"
+            );
+
+            image.onload = function () {
+
+                loading.style.display = 'none';
+                image.style.display = 'block';
+
+            };
+
+            image.onerror = function () {
+
+                loading.textContent =
+                    "कार्ड की image load नहीं हो सकी।";
+
+                console.error(
+                    "Image failed to load:",
+                    signedUrl
+                );
+            };
+        }
+
+        // ==========================================
+        // MODAL
+        // ==========================================
+
+        function closeModal() {
+            document.getElementById('cardModal')
+                .classList.remove('show');
+
+            document.getElementById('modalImage').src = '';
+        }
+
+        document.getElementById('closeModal')
+            .addEventListener('click', closeModal);
+
+        document.getElementById('closeModalBottom')
+            .addEventListener('click', closeModal);
+
+        document.getElementById('cardModal')
+            .addEventListener('click', event => {
+                if (event.target.id === 'cardModal') {
+                    closeModal();
+                }
+            });
+
+
+        // ==========================================
+        // LOGOUT
+        // ==========================================
+
+        document.getElementById('logoutBtn')
+            .addEventListener('click', async () => {
+                await supabaseClient.auth.signOut();
+                window.location.href = 'index.html';
+            });
+
+
+        // ==========================================
+        // HTML ESCAPE
+        // ==========================================
+
+        function escapeHTML(value) {
+            if (value === null || value === undefined) {
+                return '';
+            }
+
+            const div = document.createElement('div');
+            div.textContent = String(value);
+            return div.innerHTML;
+        }
+
+
+        // ==========================================
+        // INITIALIZE
+        // ==========================================
+
+        // ==========================================
+        // CHECK SUPER ADMIN
+        // ==========================================
+
+        async function checkSuperAdmin() {
+
+            const {
+                data: profile,
+                error
+            } = await supabaseClient
+                .from('admin_profiles')
+                .select('name, role')
+                .eq('id', currentUser.id)
+                .single();
+
+
+            if (error) {
+
+                console.error(
+                    'Profile check error:',
+                    error
+                );
+
+                return false;
+            }
+
+
+            if (profile.role !== 'super_admin') {
+
+                return false;
+            }
+
+
+            document
+                .getElementById('adminManagement')
+                .classList.remove('hidden');
+
+
+            return true;
+        }
+
+
+
+        // ==========================================
+        // CREATE ADMIN
+        // ==========================================
+
+        async function createAdmin() {
+
+            const name =
+                document
+                    .getElementById('newAdminName')
+                    .value
+                    .trim();
+
+            const email =
+                document
+                    .getElementById('newAdminEmail')
+                    .value
+                    .trim();
+
+            const password =
+                document
+                    .getElementById('newAdminPassword')
+                    .value;
+
+
+            const message =
+                document.getElementById('adminMessage');
+
+            const button =
+                document.getElementById('createAdminBtn');
+
+
+            message.textContent = '';
+            message.className = 'text-sm';
+
+
+            if (!name || !email || !password) {
+
+                message.textContent =
+                    'कृपया सभी fields भरें।';
+
+                message.classList.add(
+                    'text-red-600'
+                );
+
+                return;
+            }
+
+
+            if (password.length < 6) {
+
+                message.textContent =
+                    'Password कम से कम 6 characters का होना चाहिए।';
+
+                message.classList.add(
+                    'text-red-600'
+                );
+
+                return;
+            }
+
+
+            button.disabled = true;
+
+            button.textContent =
+                'Admin बनाया जा रहा है...';
+
+
+            const {
+                data,
+                error
+            } = await supabaseClient.functions.invoke(
+                'manage-admin',
+                {
+                    body: {
+                        action: 'create',
+                        name,
+                        email,
+                        password
+                    }
+                }
+            );
+
+
+            button.disabled = false;
+
+            button.textContent =
+                '+ नया Admin बनाएँ';
+
+
+            if (error) {
+
+                console.error(
+                    'Create admin error:',
+                    error
+                );
+
+                message.textContent =
+                    'Admin बनाया नहीं जा सका।';
+
+                message.classList.add(
+                    'text-red-600'
+                );
+
+                return;
+            }
+
+
+            if (!data || !data.success) {
+
+                message.textContent =
+                    data?.error ||
+                    'Admin creation failed.';
+
+                message.classList.add(
+                    'text-red-600'
+                );
+
+                return;
+            }
+
+
+            message.textContent =
+                `✓ ${name} successfully बनाया गया।`;
+
+            message.classList.add(
+                'text-green-600'
+            );
+
+
+            // Clear form
+
+            document.getElementById(
+                'newAdminName'
+            ).value = '';
+
+            document.getElementById(
+                'newAdminEmail'
+            ).value = '';
+
+            document.getElementById(
+                'newAdminPassword'
+            ).value = '';
+
+        }
+
+        async function loadAdminList() {
+
+            const list =
+                document.getElementById('adminList');
+
+            const loading =
+                document.getElementById('adminListLoading');
+
+
+            const { data: profiles, error } =
+                await supabaseClient
+                    .from('admin_profiles')
+                    .select('id, name, role')
+                    .order('name');
+
+
+            if (error) {
+
+                console.error(
+                    'Admin list error:',
+                    error
+                );
+
+                loading.textContent =
+                    'Admin list लोड नहीं हो सकी।';
+
+                return;
+            }
+
+
+            // Get emails from Auth indirectly through
+            // the invitation records for now.
+            //
+            // We will improve this later if needed.
+
+            const adminEmails = {};
+
+
+            allInvitations.forEach(invitation => {
+
+                if (
+                    invitation.generated_by &&
+                    invitation.generated_by_login
+                ) {
+
+                    adminEmails[
+                        invitation.generated_by
+                    ] =
+                        invitation.generated_by_login;
+
+                }
+
+            });
+
+
+            loading.classList.add('hidden');
+
+            list.innerHTML = '';
+
+
+            profiles.forEach(profile => {
+
+                const row =
+                    document.createElement('tr');
+
+                row.className =
+                    'border-t border-gray-100';
+
+
+                const isSuperAdmin =
+                    profile.role === 'super_admin';
+
+                const isCurrentUser =
+                    profile.id === currentUser.id;
+
+
+                let action = '';
+
+
+                if (isSuperAdmin || isCurrentUser) {
+
+                    action = `
+                <span class="text-xs
+                             font-semibold
+                             text-pink-600">
+                    Protected
+                </span>
+            `;
+
+                } else {
+
+                    action = `
+                <button
+                    class="delete-admin-btn
+                           border border-red-500
+                           text-red-600
+                           px-3 py-1.5
+                           rounded-lg
+                           text-sm
+                           font-semibold
+                           hover:bg-red-50"
+                    data-id="${escapeHTML(profile.id)}"
+                    data-name="${escapeHTML(profile.name)}">
+
+                    हटाएँ
+
+                </button>
+            `;
+
+                }
+
+
+                row.innerHTML = `
+
+            <td class="px-5 py-4 font-semibold">
+                ${escapeHTML(profile.name)}
+            </td>
+
+            <td class="px-5 py-4 text-gray-600">
+                ${escapeHTML(
+                    adminEmails[profile.id] || '-'
+                )}
+            </td>
+
+            <td class="px-5 py-4">
+
+                <span class="
+                    inline-block
+                    px-2.5
+                    py-1
+                    rounded-full
+                    text-xs
+                    font-semibold
+                    ${isSuperAdmin
+                        ? 'bg-pink-100 text-pink-700'
+                        : 'bg-gray-100 text-gray-700'
+                    }
+                ">
+
+                    ${isSuperAdmin
+                        ? 'SUPER ADMIN'
+                        : 'ADMIN'
+                    }
+
+                </span>
+
+            </td>
+
+            <td class="px-5 py-4 text-center">
+                ${action}
+            </td>
+
+        `;
+
+
+                list.appendChild(row);
+
+            });
+
+
+            // Delete buttons
+
+            document
+                .querySelectorAll('.delete-admin-btn')
+                .forEach(button => {
+
+                    button.addEventListener(
+                        'click',
+                        () => {
+
+                            deleteAdmin(
+                                button.dataset.id,
+                                button.dataset.name
+                            );
+
+                        }
+                    );
+
+                });
+
+        }
+
+        // ==========================================
+        // CREATE ADMIN BUTTON
+        // ==========================================
+
+        document
+            .getElementById('createAdminBtn')
+            .addEventListener(
+                'click',
+                createAdmin
+            );
+
+        async function initializeDashboard() {
+
+            const user =
+                await checkAdminLogin();
+
+            if (!user) {
+                return;
+            }
+
+
+            const isSuperAdmin =
+                await checkSuperAdmin();
+
+            await loadInvitations();
+
+            if (isSuperAdmin) {
+                await loadAdminList();
+            }
+        }
+
+        async function deleteAdmin(
+            adminId,
+            adminName
+        ) {
+
+            const confirmed =
+                confirm(
+                    `क्या आप "${adminName}" को Admin से हटाना चाहते हैं?\n\nयह उसका login भी deactivate/delete कर देगा।`
+                );
+
+
+            if (!confirmed) {
+                return;
+            }
+
+
+            const { data, error } =
+                await supabaseClient.functions.invoke(
+                    'manage-admin',
+                    {
+                        body: {
+                            action: 'delete',
+                            adminId
+                        }
+                    }
+                );
+
+
+            if (error) {
+
+                console.error(
+                    'Delete admin error:',
+                    error
+                );
+
+                alert(
+                    'Admin हटाया नहीं जा सका।'
+                );
+
+                return;
+            }
+
+
+            if (!data || !data.success) {
+
+                alert(
+                    data?.error ||
+                    'Admin deletion failed.'
+                );
+
+                return;
+            }
+
+
+            alert(
+                `${adminName} को सफलतापूर्वक हटाया गया।`
+            );
+
+
+            await loadAdminList();
+
+        }
+
+        initializeDashboard();
+    </script>
+
+</body>
+
+</html>

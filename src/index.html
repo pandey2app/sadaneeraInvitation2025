@@ -144,7 +144,19 @@
         </div>
     </div>
 
-    <script src="card.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        const SUPABASE_URL = 'https://luxzqnmpxsoqrsxfpreg.supabase.co';
+        const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_xyauuD5OKpmNXxywzlZ5jQ_ct0OqaJi';
+
+        const supabaseClient = supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_PUBLISHABLE_KEY
+        );
+    </script>
+
+<script src="card.js"></script>
 </body>
 
 </html>

@@ -137,20 +137,143 @@ image.addEventListener('change', () => {
         document.getElementById('downloadBtn').classList.remove('hidden')
 });
 
+async function saveInvitationRecord() {
+    try {
+        const { data: userData, error: userError } =
+            await supabaseClient.auth.getUser();
+
+        if (userError || !userData.user) {
+            throw new Error('Admin is not logged in.');
+        }
+
+        const user = userData.user;
+
+        const invitationNumber = `SNM-${Date.now()}`;
+
+        const invitationData = {
+            invitation_number: invitationNumber,
+            guest_name: name.value.trim(),
+            gender: gender.value,
+            designation: sirname.value.trim(),
+            generated_by: user.id,
+            generated_by_login: user.email
+        };
+
+        const { data, error } = await supabaseClient
+            .from('invitations')
+            .insert([invitationData])
+            .select();
+
+        if (error) {
+            console.error('Invitation save error:', error);
+            throw error;
+        }
+
+        return data[0];
+
+    } catch (error) {
+        console.error('Failed to save invitation:', error);
+        return null;
+    }
+}
+
+async function uploadCardToSupabase(canvas, invitationNumber) {
+
+    const fileName = `${invitationNumber}.png`;
+
+    const blob = await new Promise(resolve => {
+        canvas.toBlob(resolve, 'image/png');
+    });
+
+    if (!blob) {
+        throw new Error('Could not create image blob.');
+    }
+
+    const { data, error } = await supabaseClient
+        .storage
+        .from('invitations')
+        .upload(fileName, blob, {
+            contentType: 'image/png',
+            upsert: false
+        });
+
+    if (error) {
+        console.error('Storage upload error:', error);
+        throw error;
+    }
+
+    console.log('Card uploaded:', data);
+
+    return data.path;
+}
+
 // Function to download the card as an image
-document.getElementById('downloadBtn').addEventListener('click', function () {
+document.getElementById('downloadBtn').addEventListener('click', async function () {
+
+    const downloadBtn = document.getElementById('downloadBtn');
     const card = document.getElementById('card');
 
-    // Ensure the card is visible for capturing
-    card.classList.remove('hidden');
-    
-    html2canvas(card).then(function (canvas) {
-        // Create an <a> element to download the canvas image
+    try {
+
+        downloadBtn.disabled = true;
+        downloadBtn.textContent = 'कार्ड सुरक्षित किया जा रहा है...';
+
+        card.classList.remove('hidden');
+
+        // Generate PNG
+        const canvas = await html2canvas(card);
+
+        // Save invitation information
+        const savedInvitation = await saveInvitationRecord();
+
+        if (!savedInvitation) {
+            throw new Error('Invitation record could not be saved.');
+        }
+
+        // Upload generated card
+        const cardPath = await uploadCardToSupabase(
+            canvas,
+            savedInvitation.invitation_number
+        );
+
+        // Save card path in database
+        const { error: updateError } = await supabaseClient
+            .from('invitations')
+            .update({
+                generated_card_url: cardPath
+            })
+            .eq('id', savedInvitation.id);
+
+        if (updateError) {
+            throw updateError;
+        }
+
+        // Download locally
         const link = document.createElement('a');
+
         link.href = canvas.toDataURL('image/png');
-        link.download = 'sadaneera-2025-invitation.png';
+
+        link.download =
+            `${savedInvitation.invitation_number}.png`;
+
         link.click();
-    });
+
+        downloadBtn.textContent = 'निमंत्रण कार्ड सुरक्षित करें';
+        downloadBtn.disabled = false;
+
+        alert('निमंत्रण कार्ड सफलतापूर्वक सुरक्षित हो गया।');
+
+    } catch (error) {
+
+        console.error('Card generation/save error:', error);
+
+        alert(
+            'कार्ड सुरक्षित करने में समस्या हुई। कृपया Console में error देखें।'
+        );
+
+        downloadBtn.textContent = 'निमंत्रण कार्ड सुरक्षित करें';
+        downloadBtn.disabled = false;
+    }
 });
 
 const photoDiv = document.getElementById("photoContainer");
@@ -229,58 +352,69 @@ function calculateAspectRatio(width, height) {
     }
 }
 
-function authenticate() {
-    const username = document.getElementById('username').value;
+async function authenticate() {
+    const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
 
-    // Sample credentials for demo purposes
-    const validUsername = 'admin@cards';
-    const validPassword = 'aditya@sadaneera';
+    const authError = document.getElementById('authError');
 
-    if (username === validUsername && password === validPassword) {
+    authError.classList.add('hidden');
 
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('loginTime', new Date().getTime().toString());
-
-        document.getElementById('authModal').classList.add('hidden');
-        document.getElementById('mainContent').classList.remove('hidden');
-        window.location.reload();
-    } else {
-        document.getElementById('authError').classList.remove('hidden');
+    if (!username || !password) {
+        authError.textContent = 'Please enter username and password';
+        authError.classList.remove('hidden');
+        return;
     }
+
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: username,
+        password: password
+    });
+
+    if (error) {
+        console.error('Login error:', error);
+        authError.textContent = 'Invalid username or password!';
+        authError.classList.remove('hidden');
+        return;
+    }
+
+    // console.log('Logged in user:', data.user);
+
+    document.getElementById('authModal').classList.add('hidden');
+    document.getElementById('mainContent').classList.remove('hidden');
+
+    checkLoginStatus();
 }
 
-function checkLoginStatus() {
-    const isLoggedIn = localStorage.getItem('isLoggedIn');
-    const loginTime = localStorage.getItem('loginTime');
+async function checkLoginStatus() {
+    const { data, error } = await supabaseClient.auth.getUser();
 
     const logoutBtn = document.getElementById('logoutBtn');
+    const authModal = document.getElementById('authModal');
+    const mainContent = document.getElementById('mainContent');
 
-    if (isLoggedIn === 'true' && loginTime) {
-        const currentTime = new Date().getTime();
-        const timeElapsed = (currentTime - parseInt(loginTime)) / (1000 * 60); // time in minutes
-        console.log(timeElapsed);
-        
-        
-        if (timeElapsed < 600) {
-            // Less than 10 minutes have passed, show main content
-            logoutBtn.classList.replace('hidden', 'inline-block');
-            document.getElementById('authModal').style.display = 'none';
-            document.getElementById('mainContent').classList.remove('hidden');
-        } else {
-            // More than 10 minutes have passed, clear login state
-            localStorage.removeItem('isLoggedIn');
-            localStorage.removeItem('loginTime');
-            logoutBtn.classList.replace( 'inline-block', 'hidden');
-        }
-    }else{
-
+    if (error || !data.user) {
+        authModal.style.display = 'flex';
+        mainContent.classList.add('hidden');
+        logoutBtn.classList.replace('inline-block', 'hidden');
+        return;
     }
+
+    // console.log('Current admin:', data.user.email);
+
+    authModal.style.display = 'none';
+    mainContent.classList.remove('hidden');
+    logoutBtn.classList.replace('hidden', 'inline-block');
 }
 
-function logout() {
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('loginTime');
+async function logout() {
+    const { error } = await supabaseClient.auth.signOut();
+
+    if (error) {
+        console.error('Logout error:', error);
+        return;
+    }
+
     window.location.reload();
 }
 
